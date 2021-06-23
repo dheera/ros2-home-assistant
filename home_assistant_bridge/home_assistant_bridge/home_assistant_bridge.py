@@ -32,6 +32,16 @@ class HomeAssistantNode(Node):
         self.declare_parameter('host', "192.168.1.100")
         self.declare_parameter('port', 8123)
         self.declare_parameter('token', config["token"])
+        self.declare_parameter('blacklist', [
+            "persistent_notification.",
+            "sensor.hacs",
+            "person.",
+            "binary_sensor.updater",
+            "zone.",
+        ])
+        self.blacklist = self.get_parameter("blacklist")._value
+        print(self.blacklist)
+
         self.ha = HomeAssistant(self.get_parameter("host")._value, self.get_parameter("port")._value, self.get_parameter("token")._value)
 
         self.timer = self.create_timer(1, self.on_timer)
@@ -41,7 +51,13 @@ class HomeAssistantNode(Node):
 
     def on_timer(self):
         for state in self.ha.states():
-            print(state)
+            blacklisted = False
+            for blacklist_item in self.blacklist:
+                if state["entity_id"].startswith(blacklist_item):
+                    blacklisted = True
+            if blacklisted:
+                continue
+
             topic_name = state["entity_id"].replace(".", "/")
 
             if state["state"] in ("on", "off"):
