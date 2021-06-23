@@ -9,9 +9,10 @@ import sys
 import time
 import requests
 
+from dateutil.parser import parse
+
 from std_msgs.msg import String, Int32, Int64, Float32, Float64, Bool
-from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
-from sensor_msgs.msg import Temperature
+from builtin_interfaces.msg import Time
 from home_assistant_msgs.msg import *
 
 try:
@@ -23,6 +24,13 @@ except:
 
 with open(os.path.expanduser("~/private/credentials/home_assistant.json")) as f:
     config = json.loads(f.read())
+
+def to_ros_time(s):
+    try:
+        stamp = parse(s).timestamp()
+        return Time(sec = int(stamp), nanosec = int(1e9 * (stamp % 1)))
+    except:
+        return Time()
 
 class HomeAssistantNode(Node):
     def __init__(self, node_name = "home_assistant_node"):
@@ -41,7 +49,6 @@ class HomeAssistantNode(Node):
             "zone.",
         ])
         self.blacklist = self.get_parameter("blacklist")._value
-        print(self.blacklist)
 
         self.ha = HomeAssistant(self.get_parameter("host")._value, self.get_parameter("port")._value, self.get_parameter("token")._value)
 
@@ -67,7 +74,18 @@ class HomeAssistantNode(Node):
                 ros_value = Switch(state = state["state"])
             elif state["entity_id"].startswith("sun."):
                 ros_type = Sun
-                ros_value = Sun(state = state["state"])
+                ros_value = Sun(
+                    friendly_name = str(state["attributes"].get("friendly_name", "")),
+                    azimuth = float(state["attributes"].get("azimuth", 0.0)),
+                    elevation = float(state["attributes"].get("elevation", 0.0)),
+                    next_dawn = to_ros_time(state["attributes"].get("next_dawn", "")),
+                    next_dusk = to_ros_time(state["attributes"].get("next_dusk", "")),
+                    next_midnight = to_ros_time(state["attributes"].get("next_midnight", "")),
+                    next_noon = to_ros_time(state["attributes"].get("next_noon", "")),
+                    next_rising = to_ros_time(state["attributes"].get("next_rising", "")),
+                    next_setting = to_ros_time(state["attributes"].get("next_setting", "")),
+                    state = state["state"],
+                )
             elif state["entity_id"].startswith("weather."):
                 ros_type = WeatherForecast
                 ros_value = WeatherForecast(
@@ -80,6 +98,7 @@ class HomeAssistantNode(Node):
                     wind_speed = float(state["attributes"].get("wind_speed",0.0)),
                     forecast = [
                         ForecastData(
+                            datetime = to_ros_time(data_point.get("datetime", "")),
                             condition = str(data_point.get("condition", "")),
                             precipitation = float(data_point.get("precipitation", 0.0)),
                             temperature = float(data_point.get("temperature", 0.0)),
