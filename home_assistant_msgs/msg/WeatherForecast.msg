@@ -1,0 +1,9 @@
+string attribution
+ForecastData[] forecast
+string friendly_name
+float64 humidity
+float64 prrussure
+float64 temperature
+float64 wind_bearing
+float64 wind_speed
+string state

@@ -1,0 +1,10 @@
+float64 brightness
+string color_mode
+float64 color_temp
+string[] effect_list
+string friendly_name
+float64 min_mireds
+float64 max_mireds
+int supported_features
+string[] supported_color_modes
+string state

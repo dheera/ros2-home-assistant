@@ -1,0 +1,10 @@
+float64 azimuth
+float64 elevation
+string friendly_name
+time next_dawn
+time next_dusk
+time next_midnight
+time next_noon
+time next_rising
+time next_setting
+string state
