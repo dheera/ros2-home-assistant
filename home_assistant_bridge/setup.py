@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'home_assistant'
+package_name = 'home_assistant_bridge'
 
 setup(
     name=package_name,
@@ -18,7 +18,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "home_assistant_bridge = home_assistant.home_assistant_bridge:main",
+            "home_assistant_bridge = home_assistant_bridge.home_assistant_bridge:main",
         ],
     },
 )
