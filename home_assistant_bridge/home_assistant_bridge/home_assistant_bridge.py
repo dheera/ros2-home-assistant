@@ -12,6 +12,7 @@ import requests
 from std_msgs.msg import String, Int32, Int64, Float32, Float64, Bool
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 from sensor_msgs.msg import Temperature
+from home_assistant_msgs.msg import *
 
 try:
     # when executed as module
@@ -58,20 +59,52 @@ class HomeAssistantNode(Node):
             if blacklisted:
                 continue
 
-            topic_name = state["entity_id"].replace(".", "/")
-
-            if state["state"] in ("on", "off"):
-                ros_type = Bool
-                ros_value = {"on": True, "off": False}[state["state"]]
-            elif is_int(state["state"]):
-                ros_type = Int64
-                ros_value = int(state["state"])
-            elif is_float(state["state"]):
-                ros_type = Float64
-                ros_value = float(state["state"])
+            if state["entity_id"].startswith("light."):
+                ros_type = Light
+                ros_value = Light(state = state["state"])
+            elif state["entity_id"].startswith("switch."):
+                ros_type = Switch
+                ros_value = Switch(state = state["state"])
+            elif state["entity_id"].startswith("sun."):
+                ros_type = Sun
+                ros_value = Sun(state = state["state"])
+            elif state["entity_id"].startswith("weather."):
+                ros_type = WeatherForecast
+                ros_value = WeatherForecast(
+                    friendly_name = state["attributes"].get("friendly_name",""),
+                    attribution = state["attributes"].get("attribution",""),
+                    humidity = state["attributes"].get("humidity",0.0),
+                    pressure = state["attributes"].get("pressure",0.0),
+                    temperature = state["attributes"].get("temperature",0.0),
+                    wind_bearing = state["attributes"].get("wind_bearing",0.0),
+                    wind_speed = state["attributes"].get("wind_speed",0.0),
+                    forecast = [
+                        ForecastData(
+                            condition = data_point.get("condition", ""),
+                            precipitation = data_point.get("precipitation", 0.0),
+                            temperature = data_point.get("temperature", 0.0),
+                            templow = data_point.get("templow", 0.0),
+                            wind_bearing = data_point.get("wind_bearing", 0.0),
+                            wind_speed = data_point.get("wind_speed", 0.0),
+                        ) for data_point in state["attributes"].get("forecast", [])
+                    ],
+                    state = state["state"],
+                )
             else:
-                ros_type = String
-                ros_value = str(state["state"])
+                if state["state"] in ("on", "off"):
+                    ros_type = Bool
+                    ros_value = {"on": True, "off": False}[state["state"]]
+                elif is_int(state["state"]):
+                    ros_type = Int64
+                    ros_value = int(state["state"])
+                elif is_float(state["state"]):
+                    ros_type = Float64
+                    ros_value = float(state["state"])
+                else:
+                    ros_type = String
+                    ros_value = str(state["state"])
+
+            topic_name = state["entity_id"].replace(".", "/")
 
             if topic_name not in self.pubs:
                 try:
