@@ -1,10 +1,10 @@
 float64 azimuth
 float64 elevation
 string friendly_name
-time next_dawn
-time next_dusk
-time next_midnight
-time next_noon
-time next_rising
-time next_setting
+builtin_interfaces/Time next_dawn
+builtin_interfaces/Time next_dusk
+builtin_interfaces/Time next_midnight
+builtin_interfaces/Time next_noon
+builtin_interfaces/Time next_rising
+builtin_interfaces/Time next_setting
 string state

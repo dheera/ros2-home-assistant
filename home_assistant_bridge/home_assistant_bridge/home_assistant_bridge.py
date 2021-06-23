@@ -71,21 +71,21 @@ class HomeAssistantNode(Node):
             elif state["entity_id"].startswith("weather."):
                 ros_type = WeatherForecast
                 ros_value = WeatherForecast(
-                    friendly_name = state["attributes"].get("friendly_name",""),
-                    attribution = state["attributes"].get("attribution",""),
-                    humidity = state["attributes"].get("humidity",0.0),
-                    pressure = state["attributes"].get("pressure",0.0),
-                    temperature = state["attributes"].get("temperature",0.0),
-                    wind_bearing = state["attributes"].get("wind_bearing",0.0),
-                    wind_speed = state["attributes"].get("wind_speed",0.0),
+                    friendly_name = str(state["attributes"].get("friendly_name","")),
+                    attribution = str(state["attributes"].get("attribution","")),
+                    humidity = float(state["attributes"].get("humidity",0.0)),
+                    pressure = float(state["attributes"].get("pressure",0.0)),
+                    temperature = float(state["attributes"].get("temperature",0.0)),
+                    wind_bearing = float(state["attributes"].get("wind_bearing",0.0)),
+                    wind_speed = float(state["attributes"].get("wind_speed",0.0)),
                     forecast = [
                         ForecastData(
-                            condition = data_point.get("condition", ""),
-                            precipitation = data_point.get("precipitation", 0.0),
-                            temperature = data_point.get("temperature", 0.0),
-                            templow = data_point.get("templow", 0.0),
-                            wind_bearing = data_point.get("wind_bearing", 0.0),
-                            wind_speed = data_point.get("wind_speed", 0.0),
+                            condition = str(data_point.get("condition", "")),
+                            precipitation = float(data_point.get("precipitation", 0.0)),
+                            temperature = float(data_point.get("temperature", 0.0)),
+                            templow = float(data_point.get("templow", 0.0)),
+                            wind_bearing = float(data_point.get("wind_bearing", 0.0)),
+                            wind_speed = float(data_point.get("wind_speed", 0.0)),
                         ) for data_point in state["attributes"].get("forecast", [])
                     ],
                     state = state["state"],
@@ -93,16 +93,16 @@ class HomeAssistantNode(Node):
             else:
                 if state["state"] in ("on", "off"):
                     ros_type = Bool
-                    ros_value = {"on": True, "off": False}[state["state"]]
+                    ros_value = Bool(data = {"on": True, "off": False}[state["state"]])
                 elif is_int(state["state"]):
                     ros_type = Int64
-                    ros_value = int(state["state"])
+                    ros_value = Int64(data = int(state["state"]))
                 elif is_float(state["state"]):
                     ros_type = Float64
-                    ros_value = float(state["state"])
+                    ros_value = Float64(data = float(state["state"]))
                 else:
                     ros_type = String
-                    ros_value = str(state["state"])
+                    ros_value = String(data = str(state["state"]))
 
             topic_name = state["entity_id"].replace(".", "/")
 
@@ -118,10 +118,7 @@ class HomeAssistantNode(Node):
                 self.log.warn("type changed for %s (%s -> %s)" % (topic_name, str(self.ros_types[topic_name], str(ros_type))))
                 continue
 
-            msg = self.ros_types[topic_name]()
-            print(topic_name, self.ros_types[topic_name], ros_value)
-            msg.data = ros_value
-            self.pubs[topic_name].publish(msg)
+            self.pubs[topic_name].publish(ros_value)
 
 def is_int(s):
     try:

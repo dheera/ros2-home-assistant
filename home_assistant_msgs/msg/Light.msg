@@ -5,6 +5,6 @@ string[] effect_list
 string friendly_name
 float64 min_mireds
 float64 max_mireds
-int supported_features
+int64 supported_features
 string[] supported_color_modes
 string state

@@ -21,24 +21,17 @@ find_package(rosidl_default_generators REQUIRED)
 find_package(unique_identifier_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(builtin_interfaces REQUIRED)
 
 set(msg_files
-  "msg/mobile_robot/MobileRobotState.msg"
-  "msg/mobile_robot/MobileRobotFleetState.msg"
-  "msg/mobile_robot/Mission.msg"
-  "msg/mobile_robot/Location.msg"
-  "msg/mobile_robot/Path.msg"
-  "msg/mobile_robot/Images.msg"
-  "msg/mobile_robot/OperatingMode.msg"
-  "msg/mobile_robot/Payload.msg"
-  "msg/mobile_robot/Task.msg"
-  "msg/mobile_robot/TaskParameter.msg"
-  "msg/mobile_robot/MobileRobotProblem.msg"
-  "msg/traffic_light/ClassicTrafficLightState.msg"
+    "msg/ForecastData.msg"
+    "msg/Light.msg"
+    "msg/Sun.msg"
+    "msg/Switch.msg"
+    "msg/WeatherForecast.msg"
 )
 
 set(action_files
-  "action/MobileRobotMission.action"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}

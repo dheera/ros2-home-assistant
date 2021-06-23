@@ -1,2 +1,2 @@
 string friendly_name
-bool state
+string state

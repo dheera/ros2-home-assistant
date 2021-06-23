@@ -1,5 +1,5 @@
 string condition
-time datetime
+builtin_interfaces/Time datetime
 float64 precipitation
 float64 templow
 float64 temperature
