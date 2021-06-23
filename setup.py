@@ -18,7 +18,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "home_assistant_node = home_assistant.home_assistant:main",
+            "home_assistant_bridge = home_assistant.home_assistant_bridge:main",
         ],
     },
 )
