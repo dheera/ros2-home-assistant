@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker build -t dheera/ros2-home-assistant -f Dockerfile .

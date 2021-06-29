@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run --net host -it dheera/ros2-home-assistant
